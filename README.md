@@ -12,7 +12,7 @@ This is a fix to remove pillarboxing/letterboxing in Star Trek Resurgence.
 
 ## Installation
 - Grab the latest release of StarTrekResurgenceFix from [here.](https://github.com/Lyall/StarTrekResurgenceFix/releases)
-- Extract the contents of the release zip in to the the Win64 folder.<br />(e.g. "**C:\Games\Star Trek Resurgence**").
+- Extract the contents of the release zip in to the the Win64 folder. (e.g. "**C:\Games\Star Trek Resurgence**").
 
 ### Testing Notes
 - Tested on the Epic Store version at 32:9 and 21:9.
