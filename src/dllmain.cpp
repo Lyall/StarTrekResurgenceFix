@@ -28,7 +28,7 @@ float fNewY;
 float fNativeAspect = (float)16/9;
 float fPi = 3.14159265358979323846f;
 float fNewAspect;
-string sFixVer = "1.0.1";
+string sFixVer = "1.0.2";
 
 // ApplyResolution Hook
 DWORD64 ApplyResolutionReturnJMP;
