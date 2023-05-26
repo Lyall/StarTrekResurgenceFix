@@ -45,30 +45,6 @@ void __declspec(naked) ApplyResolution_CC()
     }
 }
 
-// CurrResolution Hook
-DWORD64 CurrResolutionReturnJMP;
-void __declspec(naked) CurrResolution_CC()
-{
-    __asm
-    {
-        mov r12d, r9d                               // Original code
-        mov rbx, rdx                                // Original code
-        mov rdi, [rax + r8 * 0x8]                   // Original code
-        add rdi, rcx                                // Original code
-        mov eax, [rdi]                              // Original code
-
-        mov[iCustomResX], r15d                      // Grab current resX
-        mov[iCustomResY], r12d                      // Grab current resY
-        cvtsi2ss xmm14, r15d
-        cvtsi2ss xmm15, r12d
-        divss xmm14,xmm15
-        movss [fNewAspect], xmm14                   // Grab current aspect ratio
-        xorps xmm14,xmm14
-        xorps xmm15,xmm15
-        jmp[CurrResolutionReturnJMP]
-    }
-}
-
 // Aspect Ratio/FOV Hook
 DWORD64 AspectFOVFixReturnJMP;
 float FOVPiDiv;
@@ -256,23 +232,6 @@ void AspectFOVFix()
                 LOG_F(INFO, "Apply Resolution: Pattern scan failed.");
             }
 
-        }
-
-        // FSlateRHIRenderer::ConditionalResizeViewport 
-        uint8_t* CurrResolutionScanResult = Memory::PatternScan(baseModule, "33 ?? B9 ?? ?? ?? ?? 45 ?? ?? 48 ?? ?? 4A ?? ?? ?? 48 ?? ?? 8B ??");
-        if (CurrResolutionScanResult)
-        {
-            DWORD64 CurrResolutionAddress = (uintptr_t)CurrResolutionScanResult + 0x7;
-            int CurrResolutionHookLength = Memory::GetHookLength((char*)CurrResolutionAddress, 13);
-            CurrResolutionReturnJMP = CurrResolutionAddress + CurrResolutionHookLength;
-            Memory::DetourFunction64((void*)CurrResolutionAddress, CurrResolution_CC, CurrResolutionHookLength);
-
-            LOG_F(INFO, "Current Resolution: Hook length is %d bytes", CurrResolutionHookLength);
-            LOG_F(INFO, "Current Resolution: Hook address is 0x%" PRIxPTR, (uintptr_t)CurrResolutionAddress);
-        }
-        else if (!CurrResolutionScanResult)
-        {
-            LOG_F(INFO, "Current Resolution: Pattern scan failed.");
         }
 
         // UCameraComponent::GetCameraView
