@@ -35,9 +35,9 @@ void __declspec(naked) ApplyResolution_CC()
 {
     __asm
     {
-        mov[rsp + 0x08], rbx  // Original Code
-        mov[rsp + 0x10], rsi  // Original Code
-        mov[rsp + 0x18], rdi  // Original Code
+        mov[rsp + 0x08], rbx                        // Original Code
+        mov[rsp + 0x10], rsi                        // Original Code
+        mov[rsp + 0x18], rdi                        // Original Code
 
         mov ecx, iCustomResX
         mov edx, iCustomResY
@@ -51,18 +51,18 @@ void __declspec(naked) CurrResolution_CC()
 {
     __asm
     {
-        mov r12d, r9d                          // Original code
-        mov rbx, rdx                           // Original code
-        mov rdi, [rax + r8 * 0x8]              // Original code
-        add rdi, rcx                           // Original code
-        mov eax, [rdi]                         // Original code
+        mov r12d, r9d                               // Original code
+        mov rbx, rdx                                // Original code
+        mov rdi, [rax + r8 * 0x8]                   // Original code
+        add rdi, rcx                                // Original code
+        mov eax, [rdi]                              // Original code
 
-        mov[iCustomResX], r15d                 // Grab current resX
-        mov[iCustomResY], r12d                 // Grab current resY
+        mov[iCustomResX], r15d                      // Grab current resX
+        mov[iCustomResY], r12d                      // Grab current resY
         cvtsi2ss xmm14, r15d
         cvtsi2ss xmm15, r12d
         divss xmm14,xmm15
-        movss [fNewAspect], xmm14              // Grab current aspect ratio
+        movss [fNewAspect], xmm14                   // Grab current aspect ratio
         xorps xmm14,xmm14
         xorps xmm15,xmm15
         jmp[CurrResolutionReturnJMP]
@@ -78,39 +78,39 @@ void __declspec(naked) AspectFOVFix_CC()
 {
     __asm
     {
-        mov eax, [fNewAspect]                  // Move new aspect to eax
-        cmp eax, [fNativeAspect]               // Compare new aspect to native
-        jle originalCode                       // Skip FOV fix if fNewAspect<=fNativeAspect
-        cmp [iFOVFix], 1                       // Check if FOVFix is enabled
-        je modifyFOV                           // jmp to FOV fix
-        jmp originalCode                       // jmp to originalCode
+        mov eax, [fNewAspect]                       // Move new aspect to eax
+        cmp eax, [fNativeAspect]                    // Compare new aspect to native
+        jle originalCode                            // Skip FOV fix if fNewAspect<=fNativeAspect
+        cmp [iFOVFix], 1                            // Check if FOVFix is enabled
+        je modifyFOV                                // jmp to FOV fix
+        jmp originalCode                            // jmp to originalCode
 
         modifyFOV:
-            fld dword ptr[rbx + 0x1F8]         // Push original FOV to FPU register st(0)
-            fmul[FOVPiDiv]                     // Multiply st(0) by Pi/360
-            fptan                              // Get partial tangent. Store result in st(1). Store 1.0 in st(0)
-            fxch st(1)                         // Swap st(1) to st(0)
-            fdiv[fNativeAspect]                // Divide st(0) by 1.778~
-            fmul[fNewAspect]                   // Multiply st(0) by new aspect ratio
-            fxch st(1)                         // Swap st(1) to st(0)
-            fpatan                             // Get partial arc tangent from st(0), st(1)
-            fmul[FOVDivPi]                     // Multiply st(0) by 360/Pi
-            fadd[fAdditionalFOV]               // Add additional FOV
-            fstp[FOVFinalValue]                // Store st(0) 
-            movss xmm0, [FOVFinalValue]        // Copy final FOV value to xmm0
+            fld dword ptr[rbx + 0x1F8]              // Push original FOV to FPU register st(0)
+            fmul[FOVPiDiv]                          // Multiply st(0) by Pi/360
+            fptan                                   // Get partial tangent. Store result in st(1). Store 1.0 in st(0)
+            fxch st(1)                              // Swap st(1) to st(0)
+            fdiv[fNativeAspect]                     // Divide st(0) by 1.778~
+            fmul[fNewAspect]                        // Multiply st(0) by new aspect ratio
+            fxch st(1)                              // Swap st(1) to st(0)
+            fpatan                                  // Get partial arc tangent from st(0), st(1)
+            fmul[FOVDivPi]                          // Multiply st(0) by 360/Pi
+            fadd[fAdditionalFOV]                    // Add additional FOV
+            fstp[FOVFinalValue]                     // Store st(0) 
+            movss xmm0, [FOVFinalValue]             // Copy final FOV value to xmm0
             jmp originalCode
 
         originalCode:
-            movss[rdi + 0x18], xmm0            // Original code
+            movss[rdi + 0x18], xmm0                 // Original code
             cmp [iAspectFix], 1
             je modifyAspect
-            mov eax, [rbx + 0x00000208]        // Original code
-            mov[rdi + 0x2C], eax               // Original code
+            mov eax, [rbx + 0x00000208]             // Original code
+            mov[rdi + 0x2C], eax                    // Original code
             jmp [AspectFOVFixReturnJMP]
 
         modifyAspect:
             mov eax, [fNewAspect]
-            mov[rdi + 0x2C], eax               // Original code
+            mov[rdi + 0x2C], eax                    // Original code
             jmp[AspectFOVFixReturnJMP]                         
     }
 }
@@ -121,11 +121,14 @@ void __declspec(naked) UncapFPS_CC()
 {
     __asm
     {
-        mov byte ptr[rbx+0x7A4], 0 // bSmoothFrameRate = false
-        movss xmm0, [rbx + 0x000007B8]  // Original code
-        minss xmm0, xmm6  // Original code
-        movaps xmm6, xmm0  // Original code
-        jmp[UncapFPSReturnJMP]
+        mov byte ptr[rbx+0x7A4], 0                  // bSmoothFrameRate = false
+        jmp originalCode
+
+        originalCode:
+            movss xmm0, [rbx + 0x000007B8]          // Original code
+            minss xmm0, xmm6                        // Original code
+            movaps xmm6, xmm0                       // Original code
+            jmp[UncapFPSReturnJMP]
     }
 }
 
@@ -136,10 +139,13 @@ void __declspec(naked) FOVCulling_CC()
 {
     __asm
     {
-        movss xmm1, [fOne]                      // 90/90, there is undoubtedly a smarter way of doing this
-        movss[rdx + 0x000002E8], xmm1           // Original code
-        movsd xmm0, [rbp + 0x000000E0]          // Original code
-        jmp[FOVCullingReturnJMP]
+        movss xmm1, [fOne]                          //  r.StaticMeshLODDistanceScale | 1 = default, higher is worse
+        jmp originalCode
+
+        originalCode:
+            movss[rdx + 0x000002E8], xmm1           // Original code
+            movsd xmm0, [rbp + 0x000000E0]          // Original code
+            jmp[FOVCullingReturnJMP]
     }
 }
 
