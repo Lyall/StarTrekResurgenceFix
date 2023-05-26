@@ -12,7 +12,7 @@ This is a fix to remove pillarboxing/letterboxing in Star Trek Resurgence.
 
 ## Installation
 - Grab the latest release of StarTrekResurgenceFix from [here.](https://github.com/Lyall/StarTrekResurgenceFix/releases)
-- Extract the contents of the release zip in to the the Win64 folder.<br />(e.g. "**steamapps\common\LikeADragonIshin\LikeaDragonIshin\Binaries\Win64**" for Steam).
+- Extract the contents of the release zip in to the the Win64 folder.<br />(e.g. "**C:\Games\Star Trek Resurgence**").
 
 ### Linux/Steam Deck
 - Make sure you set the Steam launch options to `WINEDLLOVERRIDES="winmm.dll=n,b" %command%`
@@ -25,9 +25,9 @@ Please report any issues you see.
 
 ## Screenshots
 
-| ![ezgif-3-ffd6bc6ca3](https://user-images.githubusercontent.com/695941/220556346-b40c2d23-7c33-4545-abc5-32b8186507fb.gif) |
+| ![ezgif-5-883b951a78](https://github.com/Lyall/StarTrekResurgenceFix/assets/695941/a1eca4a1-4b39-425c-881f-033a506a7756) |
 |:--:|
-| Disabled pillarboxing/letterboxing in gameplay. |
+| Custom resolution with disabled pillarboxing/letterboxing in gameplay. |
 
 ## Credits
 [Flawless Widescreen](https://www.flawlesswidescreen.org/) for the LOD fix.<br />
