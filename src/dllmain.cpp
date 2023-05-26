@@ -13,6 +13,7 @@ bool bFOVFix;
 bool bUncapFPS;
 bool bCutsceneFPS;
 bool bDisableDOF;
+bool bDisableMotionBlur;
 bool bCustomRes;
 int iCustomResX;
 int iCustomResY;
@@ -173,6 +174,7 @@ void ReadConfig()
     inipp::get_value(ini.sections["Uncap FPS"], "Enabled", bUncapFPS);
     inipp::get_value(ini.sections["Uncap Cutscene FPS"], "Enabled", bCutsceneFPS);
     inipp::get_value(ini.sections["Disable Depth of Field"], "Enabled", bDisableDOF);
+    inipp::get_value(ini.sections["Disable Motion Blur"], "Enabled", bDisableMotionBlur);
 
     // Custom resolution
     if (iCustomResX > 0 && iCustomResY > 0)
@@ -201,6 +203,7 @@ void ReadConfig()
     LOG_F(INFO, "Config Parse: bUncapFPS: %d", bUncapFPS);
     LOG_F(INFO, "Config Parse: bCutsceneFPS: %d", bCutsceneFPS);
     LOG_F(INFO, "Config Parse: bDisableDOF: %d", bDisableDOF);
+    LOG_F(INFO, "Config Parse: bDisableMotionBlur: %d", bDisableMotionBlur);
     LOG_F(INFO, "Config Parse: bCustomRes: %d", bCustomRes);
     LOG_F(INFO, "Config Parse: iCustomResX: %d", iCustomResX);
     LOG_F(INFO, "Config Parse: iCustomResY: %d", iCustomResY);
@@ -315,7 +318,7 @@ void UncapFPS()
     }
 }
 
-void DisableDOF()
+void GraphicalTweaks()
 {
     if (bDisableDOF)
     {
@@ -333,6 +336,23 @@ void DisableDOF()
             LOG_F(INFO, "Depth of Field: Pattern scan failed.");
         }
     }
+
+    if (bDisableMotionBlur)
+    {
+        // IsMotionBlurEnabled
+        uint8_t* MotionBlurScanResult = Memory::PatternScan(baseModule, "73 ?? 80 ?? ?? 00 74 ?? 85 ?? 7E ?? 48 ?? ?? ?? ?? ?? ??");
+        if (MotionBlurScanResult)
+        {
+            DWORD64 MotionBlurAddress = (uintptr_t)MotionBlurScanResult + 0xA;
+            Memory::PatchBytes((uintptr_t)MotionBlurAddress, "\xEB", 1);
+
+            LOG_F(INFO, "Motion Blur: Patch address is 0x%" PRIxPTR, (uintptr_t)MotionBlurAddress);
+        }
+        else if (!MotionBlurScanResult)
+        {
+            LOG_F(INFO, "Motion Blur: Pattern scan failed.");
+        }
+    }
 }
 
 DWORD __stdcall Main(void*)
@@ -342,7 +362,7 @@ DWORD __stdcall Main(void*)
     Sleep(iInjectionDelay);
     AspectFOVFix();
     UncapFPS();
-    DisableDOF();
+    GraphicalTweaks();
     return true; // end thread
 }
 
