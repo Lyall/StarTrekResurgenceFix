@@ -18,7 +18,7 @@ This is a fix to remove pillarboxing/letterboxing in Star Trek Resurgence.
 - Tested on the Epic Store version at 32:9 and 21:9.
 
 ### Linux/Steam Deck
-- - ***For Linux/Steam Deck only***: Make sure you set the Steam launch options to `WINEDLLOVERRIDES="winmm.dll=n,b" %command%`
+- ***For Linux/Steam Deck only***: Make sure you set the Steam launch options to `WINEDLLOVERRIDES="winmm.dll=n,b" %command%`
 
 ## Configuration
 - See **StarTrekResurgenceFix.ini** to adjust settings for the fix.
