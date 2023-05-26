@@ -28,7 +28,7 @@ Please report any issues you see.
 
 ## Screenshots
 
-| ![ezgif-5-883b951a78](https://github.com/Lyall/StarTrekResurgenceFix/assets/695941/a1eca4a1-4b39-425c-881f-033a506a7756) |
+| ![ezgif-5-883b951a78](https://github.com/Lyall/StarTrekResurgenceFix/assets/695941/6e502569-7270-4f88-8f57-ec2ac6519c09) |
 |:--:|
 | Custom resolution with disabled pillarboxing/letterboxing in gameplay. |
 
