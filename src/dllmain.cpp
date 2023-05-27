@@ -28,7 +28,7 @@ float fNewY;
 float fNativeAspect = (float)16/9;
 float fPi = 3.14159265358979323846f;
 float fNewAspect;
-string sFixVer = "1.0.2";
+string sFixVer = "1.0.3";
 
 // ApplyResolution Hook
 DWORD64 ApplyResolutionReturnJMP;
@@ -132,13 +132,13 @@ void __declspec(naked) MovieInterp_CC()
 {
     __asm
     {
-        mov byte ptr[rcx + 0x10], 01
+        mov byte ptr[rcx + 0x10], 01                // Force EMovieSceneEvaluationType to be "WithSubFrames" (1) instead of "FrameLocked" (0)
         jmp originalCode
 
         originalCode:
-            mov rbp, rsp                                // Original code
-            sub rsp, 128                                // Original code
-            cmp byte ptr[rcx + 0x10], 00                // Original code
+            mov rbp, rsp                            // Original code
+            sub rsp, 128                            // Original code
+            cmp byte ptr[rcx + 0x10], 00            // Original code
             jmp[MovieInterpReturnJMP]
     }
 }
@@ -360,6 +360,7 @@ void GraphicalTweaks()
         uint8_t* DOFScanResult = Memory::PatternScan(baseModule, "74 ?? 41 ?? ?? ?? ?? C1 ?? 08 ?? 01 75 ?? 32 ?? C3 ?? 01 C3");
         if (DOFScanResult)
         {
+            // Return value for DOF being enabled is changed to 0
             DWORD64 DOFAddress = (uintptr_t)DOFScanResult + 0x12;
             Memory::PatchBytes((uintptr_t)DOFAddress, "\x00", 1);
 
@@ -377,6 +378,7 @@ void GraphicalTweaks()
         uint8_t* MotionBlurScanResult = Memory::PatternScan(baseModule, "73 ?? 80 ?? ?? 00 74 ?? 85 ?? 7E ?? 48 ?? ?? ?? ?? ?? ??");
         if (MotionBlurScanResult)
         {
+            // JMP to code path where motion blur is disabled
             DWORD64 MotionBlurAddress = (uintptr_t)MotionBlurScanResult + 0xA;
             Memory::PatchBytes((uintptr_t)MotionBlurAddress, "\xEB", 1);
 
