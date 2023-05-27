@@ -26,6 +26,7 @@ This is a fix to remove pillarboxing/letterboxing in Star Trek Resurgence.
 
 ## Known Issues
 Please report any issues you see.
+- When using a custom resolution, the resolution option in settings will appear blank. This is just cosmetic and doesn't affect functionality.
 
 ## Screenshots
 
