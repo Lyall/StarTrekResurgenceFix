@@ -5,7 +5,7 @@
 This is a fix to remove pillarboxing/letterboxing in Star Trek Resurgence.
 
 ## Features
-- Custom resolution support.
+- Custom resolution/aspect ratio support.
 - Removes pillarboxing/letterboxing in gameplay and cutscenes.
 - Correct FOV scaling no matter what resolution you use.
 - Disable FPS cap in both gameplay/cutscenes + enable interpolation in cutscenes for smoother animations.
