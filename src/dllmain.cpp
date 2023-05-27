@@ -126,6 +126,23 @@ void __declspec(naked) FOVCulling_CC()
     }
 }
 
+// Movie Interpolation Hook
+DWORD64 MovieInterpReturnJMP;
+void __declspec(naked) MovieInterp_CC()
+{
+    __asm
+    {
+        mov byte ptr[rcx + 0x10], 01
+        jmp originalCode
+
+        originalCode:
+            mov rbp, rsp                                // Original code
+            sub rsp, 128                                // Original code
+            cmp byte ptr[rcx + 0x10], 00                // Original code
+            jmp[MovieInterpReturnJMP]
+    }
+}
+
 void Logging()
 {
     loguru::add_file("StarTrekResurgenceFix.log", loguru::Truncate, loguru::Verbosity_MAX);
@@ -314,6 +331,23 @@ void UncapFPS()
         else if (!CutsceneFPSScanResult)
         {
             LOG_F(INFO, "Cutscene FPS: Pattern scan failed.");
+        }
+
+        // FMovieScenePlaybackPosition::PlayTo 
+        uint8_t* MovieInterpScanResult = Memory::PatternScan(baseModule, "41 ?? 48 ?? ?? 48 ?? ?? ?? ?? 00 00 80 ?? ?? 00 49 ?? ?? 0F ?? ?? ?? ?? 48 ?? ??");
+        if (MovieInterpScanResult)
+        {
+            DWORD64 MovieInterpAddress = (uintptr_t)MovieInterpScanResult + 0x2;
+            int MovieInterpHookLength = (int)14;
+            MovieInterpReturnJMP = MovieInterpAddress + MovieInterpHookLength;
+            Memory::DetourFunction64((void*)MovieInterpAddress, MovieInterp_CC, MovieInterpHookLength);
+
+            LOG_F(INFO, "Movie Interpolation: Hook length is %d bytes", MovieInterpHookLength);
+            LOG_F(INFO, "Movie Interpolation: Hook address is 0x%" PRIxPTR, (uintptr_t)MovieInterpAddress);
+        }
+        else if (!MovieInterpScanResult)
+        {
+            LOG_F(INFO, "Movie Interpolation: Pattern scan failed.");
         }
     }
 }
