@@ -27,7 +27,6 @@ This is a fix to remove pillarboxing/letterboxing in Star Trek Resurgence.
 
 ## Known Issues
 Please report any issues you see.
-- Despite removing the 30fps cap some animations appear to be keyframed at 30fps and may appear juddery.
 
 ## Screenshots
 
