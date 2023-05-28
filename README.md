@@ -2,7 +2,7 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W01UAI9)</br>
 [![Github All Releases](https://img.shields.io/github/downloads/Lyall/StarTrekResurgenceFix/total.svg)](https://github.com/Lyall/StarTrekResurgenceFix/releases)
 
-This is a fix to remove pillarboxing/letterboxing in Star Trek Resurgence.
+This is a fix for Star Trek Resurgence that adds support for custom resolutions, uncapped framerate and more.
 
 ## Features
 - Custom resolution/aspect ratio support.
