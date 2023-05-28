@@ -5,7 +5,7 @@ All referenced files are located in `%LOCALAPPDATA%\StarTrekGame\Saved\Config\Wi
 
 ## Mouse Sensitivity + Invert X/Y Axis
 Edit `Input.ini`.
-Add the following code block:
+Add the following code block at the end of the file:
 ```ini
 [/Script/Engine.InputSettings]
 AxisConfig=(AxisKeyName="MouseX",AxisProperties=(DeadZone=0.000000,Sensitivity=0.07,Exponent=1.000000,bInvert=False))
@@ -15,3 +15,19 @@ bEnableMouseSmoothing=False
 Edit `Sensitivity` to your liking. `0.07` appears to be the UE4 default which the game uses. I personally use `0.0275`.
 
 If you would like to invert the X or Y axis you can change the respective axis to `bInvert=True`.
+
+## Graphical Tweaks to Increase Quality
+Edit `Engine.ini`.
+Add the following code block at the end of the file:
+```ini
+[SystemSettings]
+r.Tonemapper.Sharpen=0.2; Adds minor sharpening. Default = 0
+r.ScreenPercentage=100; Raise this for downsampling if you have the spare GPU horsepower. Default = 100
+r.MaxAnisotropy=16; x16 Anisotropic Filtering is very light on a modern GPU. Default = 8
+r.SceneColorFringeQuality=0; Disables chromatic aberration. Default = 1
+r.Tonemapper.GrainQuantization=0; Disables film grain. Default = 1
+r.StaticMeshLODDistanceScale=0.01; Decrease LOD bias for static meshes to reduce pop-in. Default = 1
+r.Shadow.MaxCSMResolution=4096; Bump shadow cascade resolution. Default = 2048 
+r.Shadow.MaxResolution=4096; Bump shadow resolution. Default = 2048 
+foliage.LODDistanceScale=3; Further view distance for high-quality foliage. Default = 1
+``
