@@ -32,3 +32,4 @@ r.Shadow.MaxResolution=4096; Bump shadow resolution. Default = 2048
 r.ViewDistanceScale=3; Push out object culling distance. Default = 1
 foliage.LODDistanceScale=3; Push out culling distance for foliage. Default = 1
 ```
+Edit to preference; I've tried to use sensible values here that don't hit performance too hard on a modern GPU.
