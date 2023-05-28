@@ -11,6 +11,9 @@ This is a fix to remove pillarboxing/letterboxing in Star Trek Resurgence.
 - Disable FPS cap in both gameplay/cutscenes + enable interpolation in cutscenes for smoother animations.
 - Toggles for motion blur and depth of field.
 
+## INI Tweaks
+- See [extras.md](extras.md).
+
 ## Installation
 - Grab the latest release of StarTrekResurgenceFix from [here.](https://github.com/Lyall/StarTrekResurgenceFix/releases)
 - Extract the contents of the release zip in to the the Win64 folder. (e.g. "**C:\Games\Star Trek Resurgence**").
