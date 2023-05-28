@@ -15,6 +15,7 @@ bEnableMouseSmoothing=False
 Edit `Sensitivity` to your liking. `0.07` appears to be the UE4 default which the game uses. I personally use `0.0275`.
 
 If you would like to invert the X or Y axis you can change the respective axis to `bInvert=True`. 
+
 Note: According to a developer this [may not apply to QTEs](https://forum.startrek-resurgence.com/t/how-do-i-invert-the-y-look-axis/346/20).
 
 ## Graphical Tweaks to Increase Quality
