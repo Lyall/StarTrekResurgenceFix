@@ -32,7 +32,7 @@ Please report any issues you see.
 - When using a custom resolution, the resolution option in settings will appear blank, this is just cosmetic and doesn't affect functionality.
 - Mouse sensitivity during QTE interaction segments will be slower the higher the framerate.
 - Controller sensitivity is higher during gameplay and lower during QTE interactions with higher framerates.
-- Running a resolution higher the 4K on either axis may cause the game to run extremely poorly.
+- Running a resolution higher than 4K on either axis may cause the game to run extremely poorly.
 
 ## Screenshots
 
