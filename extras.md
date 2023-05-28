@@ -30,4 +30,4 @@ r.StaticMeshLODDistanceScale=0.01; Decrease LOD bias for static meshes to reduce
 r.Shadow.MaxCSMResolution=4096; Bump shadow cascade resolution. Default = 2048 
 r.Shadow.MaxResolution=4096; Bump shadow resolution. Default = 2048 
 foliage.LODDistanceScale=3; Further view distance for high-quality foliage. Default = 1
-``
+```
