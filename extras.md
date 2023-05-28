@@ -29,5 +29,6 @@ r.Tonemapper.GrainQuantization=0; Disables film grain. Default = 1
 r.StaticMeshLODDistanceScale=0.01; Decrease LOD bias for static meshes to reduce pop-in. Default = 1
 r.Shadow.MaxCSMResolution=4096; Bump shadow cascade resolution. Default = 2048 
 r.Shadow.MaxResolution=4096; Bump shadow resolution. Default = 2048 
-foliage.LODDistanceScale=3; Further view distance for high-quality foliage. Default = 1
+r.ViewDistanceScale=3; Push out object culling distance. Default = 1
+foliage.LODDistanceScale=3; Push out culling distance for foliage. Default = 1
 ```
