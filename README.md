@@ -29,9 +29,9 @@ This is a fix to remove pillarboxing/letterboxing in Star Trek Resurgence.
 
 ## Known Issues
 Please report any issues you see.
-- When using a custom resolution, the resolution option in settings will appear blank. This is just cosmetic and doesn't affect functionality.
-- Mouse sensitivty during QTE interaction segments will be slower the higher the framerate.
-- Controller sensitivty is higher during gameplay and lower during QTE interactions the higher the framerate.
+- When using a custom resolution, the resolution option in settings will appear blank, this is just cosmetic and doesn't affect functionality.
+- Mouse sensitivity during QTE interaction segments will be slower the higher the framerate.
+- Controller sensitivity is higher during gameplay and lower during QTE interactions the higher the framerate.
 - Running a resolution higher the 5K on either axis may cause the game to run extremely poorly.
 
 ## Screenshots
