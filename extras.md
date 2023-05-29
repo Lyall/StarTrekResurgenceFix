@@ -27,8 +27,9 @@ r.MaxAnisotropy=16; x16 Anisotropic Filtering is very light on a modern GPU. Def
 r.SceneColorFringeQuality=0; Disables chromatic aberration. Default = 1
 r.Tonemapper.GrainQuantization=0; Disables film grain. Default = 1
 r.StaticMeshLODDistanceScale=0.01; Decrease LOD bias for static meshes to reduce pop-in. Default = 1
-r.Shadow.MaxCSMResolution=2048; Shadow cascade resolution. Can cause shadow striping beyond 2048. Default = 2048
-r.Shadow.MaxResolution=2048; Shadow resolution. Can cause shadow striping beyond 2048. Default = 2048
+r.Shadow.MaxCSMResolution=4096; Shadow cascade resolution. Can cause shadow striping beyond 2048. Default = 2048
+r.Shadow.MaxResolution=4096; Shadow resolution. Can cause shadow striping beyond 2048. Default = 2048
+r.Shadow.RectLightDepthBias=0.075; Helps with striping on shadows. Default = 0.025
 r.ViewDistanceScale=3; Push out object culling distance. Default = 1
 foliage.LODDistanceScale=3; Push out culling distance for foliage. Default = 1
 r.CreateShadersOnLoad=1; May help with stutters, untested. Default = 0
