@@ -33,7 +33,7 @@ r.Shadow.RectLightDepthBias=0.075; Helps with striping on shadows. Default = 0.0
 r.ViewDistanceScale=3; Push out object culling distance. Default = 1
 foliage.LODDistanceScale=3; Push out culling distance for foliage. Default = 1
 r.CreateShadersOnLoad=1; May help with stutters, untested. Default = 0
-r.VolumetricFog.GridPixelSize=6; Size of pixel grid for volumetric fog. Very demanding at lower values. Default = 4
+r.VolumetricFog.GridPixelSize=8; Size of pixel grid for volumetric fog. Very demanding at lower values. Default = 4
 r.SSR.Quality=3; Quality of screen space reflections. Default = 4
 ```
 Edit to preference; I've tried to use sensible values here that don't hit performance too hard on a modern GPU.
