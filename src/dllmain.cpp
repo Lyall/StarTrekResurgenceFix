@@ -381,16 +381,6 @@ void AspectFOVFix()
         uint8_t* HUDMarkersScanResult = Memory::PatternScan(baseModule, "0F ?? ?? 66 ?? ?? ?? 0F ?? ?? F3 0F ?? ?? F3 0F ?? ?? F3 0F ?? ?? ?? F3 0F ?? ?? ?? F3 0F ?? ?? 4C");
         if (HUDMarkersScanResult)
         {
-            if (fNewAspect > fNativeAspect)
-            {
-                HUDXOffset = ((float)iCustomResX - ((float)iCustomResY * fNativeAspect)) / 2;
-            }
-
-            if (fNewAspect < fNativeAspect)
-            {
-                HUDYOffset = ((float)iCustomResY - ((float)iCustomResX / fNativeAspect)) / 2;
-            }
-
             // Offset HUD markers
             DWORD64 HUDMarkersAddress = (uintptr_t)HUDMarkersScanResult;
             int HUDMarkersHookLength = Memory::GetHookLength((char*)HUDMarkersAddress, 13);
@@ -432,10 +422,11 @@ void UncapFPS()
 {
     if (bUncapFPS)
     {
+        // UEngine::GetMaxTickRate
         uint8_t* UncapFPSScanResult = Memory::PatternScan(baseModule, "80 ?? ?? ?? ?? ?? 02 74 ?? F3 0F ?? ?? ?? ?? ?? ?? F3 0F ?? ??");
         if (UncapFPSScanResult)
         {
-            // UEngine::GetMaxTickRate
+            // Force bSmoothFrameRate to 0
             DWORD64 UncapFPSAddress = (uintptr_t)UncapFPSScanResult + 0x9;
             int UncapFPSHookLength = Memory::GetHookLength((char*)UncapFPSAddress, 13);
             UncapFPSReturnJMP = UncapFPSAddress + UncapFPSHookLength;
@@ -456,6 +447,7 @@ void UncapFPS()
         uint8_t* CutsceneFPSScanResult = Memory::PatternScan(baseModule, "3B ?? ?? ?? ?? ?? 0F ?? ?? F3 0F ?? ?? ?? EB ?? 0F ?? ??");
         if (CutsceneFPSScanResult)
         {
+            // Zero the value for cutscene framerate cap
             DWORD64 CutsceneFPSAddress = (uintptr_t)CutsceneFPSScanResult + 0x9;
             Memory::PatchBytes((uintptr_t)CutsceneFPSAddress, "\x0F\x57\xC0\x90\x90", 5);
             LOG_F(INFO, "Cutscene FPS: Patch address is 0x%" PRIxPTR, (uintptr_t)CutsceneFPSAddress);
@@ -469,6 +461,7 @@ void UncapFPS()
         uint8_t* MovieInterpScanResult = Memory::PatternScan(baseModule, "41 ?? 48 ?? ?? 48 ?? ?? ?? ?? 00 00 80 ?? ?? 00 49 ?? ?? 0F ?? ?? ?? ?? 48 ?? ??");
         if (MovieInterpScanResult)
         {
+            // Set EMovieSceneEvaluationType to be "WithSubFrames" (1) instead of "FrameLocked" (0)
             DWORD64 MovieInterpAddress = (uintptr_t)MovieInterpScanResult + 0x2;
             int MovieInterpHookLength = (int)14;
             MovieInterpReturnJMP = MovieInterpAddress + MovieInterpHookLength;
