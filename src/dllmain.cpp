@@ -143,6 +143,25 @@ void __declspec(naked) MovieInterp_CC()
     }
 }
 
+// HUD Markers Hook
+DWORD64 HUDMarkersReturnJMP;
+float HUDXOffset = (float)0;;
+float HUDYOffset = (float)0;;
+void __declspec(naked) HUDMarkers_CC()
+{
+    __asm
+    {
+        cvtdq2ps xmm0, xmm0  // Original code
+        movss xmm0, [HUDXOffset]
+        movd xmm1, eax  // Original code
+        cvtdq2ps xmm1, xmm1  // Original code
+        movss xmm1, [HUDYOffset]
+        subss xmm3, xmm0  // Original code
+
+        jmp[HUDMarkersReturnJMP]
+    }
+}
+
 void Logging()
 {
     loguru::add_file("StarTrekResurgenceFix.log", loguru::Truncate, loguru::Verbosity_MAX);
@@ -231,29 +250,28 @@ void ReadConfig()
 
 void AspectFOVFix()
 {
+    if (bCustomRes)
+    {
+        // FSystemResolution::RequestResolutionChange
+        uint8_t* ApplyResolutionScanResult = Memory::PatternScan(baseModule, "8B ?? ?? ?? E8 ?? ?? ?? ?? 83 ?? ?? 77 ?? 85 ??");
+        if (ApplyResolutionScanResult)
+        {
+            DWORD64 ApplyResolutionAddress = Memory::GetAbsolute((uintptr_t)ApplyResolutionScanResult + 0x5);
+            int ApplyResolutionHookLength = Memory::GetHookLength((char*)ApplyResolutionAddress, 13);
+            ApplyResolutionReturnJMP = ApplyResolutionAddress + ApplyResolutionHookLength;
+            Memory::DetourFunction64((void*)ApplyResolutionAddress, ApplyResolution_CC, ApplyResolutionHookLength);
+
+            LOG_F(INFO, "Apply Resolution: Hook length is %d bytes", ApplyResolutionHookLength);
+            LOG_F(INFO, "Apply Resolution: Hook address is 0x%" PRIxPTR, (uintptr_t)ApplyResolutionAddress);
+        }
+        else if (!ApplyResolutionScanResult)
+        {
+            LOG_F(INFO, "Apply Resolution: Pattern scan failed.");
+        }
+    }
+
     if (bAspectFix)
     {
-        if (bCustomRes)
-        {
-            // FSystemResolution::RequestResolutionChange
-            uint8_t* ApplyResolutionScanResult = Memory::PatternScan(baseModule, "8B ?? ?? ?? E8 ?? ?? ?? ?? 83 ?? ?? 77 ?? 85 ??");
-            if (ApplyResolutionScanResult)
-            {
-                DWORD64 ApplyResolutionAddress = Memory::GetAbsolute((uintptr_t)ApplyResolutionScanResult + 0x5);
-                int ApplyResolutionHookLength = Memory::GetHookLength((char*)ApplyResolutionAddress, 13);
-                ApplyResolutionReturnJMP = ApplyResolutionAddress + ApplyResolutionHookLength;
-                Memory::DetourFunction64((void*)ApplyResolutionAddress, ApplyResolution_CC, ApplyResolutionHookLength);
-
-                LOG_F(INFO, "Apply Resolution: Hook length is %d bytes", ApplyResolutionHookLength);
-                LOG_F(INFO, "Apply Resolution: Hook address is 0x%" PRIxPTR, (uintptr_t)ApplyResolutionAddress);
-            }
-            else if (!ApplyResolutionScanResult)
-            {
-                LOG_F(INFO, "Apply Resolution: Pattern scan failed.");
-            }
-
-        }
-
         // UCameraComponent::GetCameraView
         uint8_t* AspectFOVFixScanResult = Memory::PatternScan(baseModule, "F3 0F ?? ?? ?? ?? ?? ?? F3 0F ?? ?? ?? 8B ?? ?? ?? ?? ?? 89 ?? ?? 0F ?? ?? ?? ?? ?? ?? 33 ?? ?? 83 ?? ??");
         if (AspectFOVFixScanResult)
@@ -272,6 +290,33 @@ void AspectFOVFix()
         else if (!AspectFOVFixScanResult)
         {
             LOG_F(INFO, "Aspect Ratio/FOV: Pattern scan failed.");
+        }
+
+        // APlayerController::ProjectWorldLocationToScreenWithDistance 
+        uint8_t* HUDMarkersScanResult = Memory::PatternScan(baseModule, "0F ?? ?? 66 ?? ?? ?? 0F ?? ?? F3 0F ?? ?? F3 0F ?? ?? F3 0F ?? ?? ?? F3 0F ?? ?? ?? F3 0F ?? ?? 4C");
+        if (HUDMarkersScanResult)
+        {
+            if (fNewAspect > fNativeAspect)
+            {
+                HUDXOffset = ((float)iCustomResX - ((float)iCustomResY * fNativeAspect)) / 2;
+            }
+
+            if (fNewAspect < fNativeAspect)
+            {
+                HUDYOffset = ((float)iCustomResY - ((float)iCustomResX / fNativeAspect)) / 2;
+            }
+
+            DWORD64 HUDMarkersAddress = (uintptr_t)HUDMarkersScanResult;
+            int HUDMarkersHookLength = Memory::GetHookLength((char*)HUDMarkersAddress, 13);
+            HUDMarkersReturnJMP = HUDMarkersAddress + HUDMarkersHookLength;
+            Memory::DetourFunction64((void*)HUDMarkersAddress, HUDMarkers_CC, HUDMarkersHookLength);
+
+            LOG_F(INFO, "HUD Markers: Hook length is %d bytes", HUDMarkersHookLength);
+            LOG_F(INFO, "HUD Markers: Hook address is 0x%" PRIxPTR, (uintptr_t)HUDMarkersAddress);
+        }
+        else if (!HUDMarkersScanResult)
+        {
+            LOG_F(INFO, "HUD Markers: Pattern scan failed.");
         }
     }
 
