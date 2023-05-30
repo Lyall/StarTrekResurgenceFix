@@ -28,7 +28,32 @@ float fNewY;
 float fNativeAspect = (float)16/9;
 float fPi = 3.14159265358979323846f;
 float fNewAspect;
-string sFixVer = "1.0.3";
+string sFixVer = "1.0.4";
+
+// CurrResolution Hook
+DWORD64 CurrResolutionReturnJMP;
+void __declspec(naked) CurrResolution_CC()
+{
+    __asm
+    {
+        mov r12d, r9d                               // Original code
+        mov rbx, rdx                                // Original code
+        mov rdi, [rax + r8 * 0x8]                   // Original code
+        add rdi, rcx                                // Original code
+        mov eax, [rdi]                              // Original code
+
+        mov[iCustomResX], r15d                      // Grab current resX
+        mov[iCustomResY], r12d                      // Grab current resY
+        cvtsi2ss xmm14, r15d
+        cvtsi2ss xmm15, r12d
+        divss xmm14, xmm15
+        movss[fNewAspect], xmm14                   // Grab current aspect ratio
+        xorps xmm14, xmm14
+        xorps xmm15, xmm15
+        jmp[CurrResolutionReturnJMP]
+    }
+}
+
 
 // ApplyResolution Hook
 DWORD64 ApplyResolutionReturnJMP;
@@ -145,20 +170,58 @@ void __declspec(naked) MovieInterp_CC()
 
 // HUD Markers Hook
 DWORD64 HUDMarkersReturnJMP;
-float HUDXOffset = (float)0;;
-float HUDYOffset = (float)0;;
+float HUDHeight;
+float HUDWidth;
+float HUDXOffset;
+float HUDYOffset;
+float fTwo = (float)2;
 void __declspec(naked) HUDMarkers_CC()
 {
     __asm
     {
-        cvtdq2ps xmm0, xmm0  // Original code
-        movss xmm0, [HUDXOffset]
-        movd xmm1, eax  // Original code
-        cvtdq2ps xmm1, xmm1  // Original code
-        movss xmm1, [HUDYOffset]
-        subss xmm3, xmm0  // Original code
+        push rax
+        mov eax, [fNewAspect]
+        cmp eax, [fNativeAspect]
+        jle vertOffset
+        jmp horOffset
 
-        jmp[HUDMarkersReturnJMP]
+        vertOffset:
+            movd xmm1, [iCustomResX]
+            cvtdq2ps xmm1, xmm1
+            divss xmm1, [fNativeAspect]
+            movss[HUDHeight], xmm1
+            movd xmm1, [iCustomResY]
+            cvtdq2ps xmm1, xmm1
+            subss xmm1, [HUDHeight]
+            divss xmm1, [fTwo]
+            movss[HUDYOffset], xmm1
+            pop rax
+            cvtdq2ps xmm0, xmm0                     // Original code
+            xorps xmm0, xmm0
+            movd xmm1, eax                          // Original code
+            cvtdq2ps xmm1, xmm1                     // Original code
+            movss xmm1, [HUDYOffset]
+            subss xmm3, xmm0                        // Original code
+            jmp[HUDMarkersReturnJMP]
+
+        horOffset:
+            movd xmm1, [iCustomResY]
+            cvtdq2ps xmm1, xmm1
+            mulss xmm1, [fNativeAspect]
+            movss[HUDWidth], xmm1
+            movd xmm1, [iCustomResX]
+            cvtdq2ps xmm1, xmm1
+            subss xmm1, [HUDWidth]
+            divss xmm1, [fTwo]
+            movss[HUDXOffset], xmm1
+            pop rax  
+            cvtdq2ps xmm0, xmm0                     // Original code
+            movss xmm0, [HUDXOffset]
+            movd xmm1, eax                          // Original code
+            cvtdq2ps xmm1, xmm1                     // Original code
+            xorps xmm1, xmm1
+            subss xmm3, xmm0                        // Original code
+            jmp[HUDMarkersReturnJMP]
     }
 }
 
@@ -256,6 +319,7 @@ void AspectFOVFix()
         uint8_t* ApplyResolutionScanResult = Memory::PatternScan(baseModule, "8B ?? ?? ?? E8 ?? ?? ?? ?? 83 ?? ?? 77 ?? 85 ??");
         if (ApplyResolutionScanResult)
         {
+            // Override resolution change
             DWORD64 ApplyResolutionAddress = Memory::GetAbsolute((uintptr_t)ApplyResolutionScanResult + 0x5);
             int ApplyResolutionHookLength = Memory::GetHookLength((char*)ApplyResolutionAddress, 13);
             ApplyResolutionReturnJMP = ApplyResolutionAddress + ApplyResolutionHookLength;
@@ -269,7 +333,27 @@ void AspectFOVFix()
             LOG_F(INFO, "Apply Resolution: Pattern scan failed.");
         }
     }
+    else
+    {
+        // FSlateRHIRenderer::ConditionalResizeViewport 
+        uint8_t* CurrResolutionScanResult = Memory::PatternScan(baseModule, "33 ?? B9 ?? ?? ?? ?? 45 ?? ?? 48 ?? ?? 4A ?? ?? ?? 48 ?? ?? 8B ??");
+        if (CurrResolutionScanResult)
+        {
+            // Grab resolution and aspect ratio
+            DWORD64 CurrResolutionAddress = (uintptr_t)CurrResolutionScanResult + 0x7;
+            int CurrResolutionHookLength = Memory::GetHookLength((char*)CurrResolutionAddress, 13);
+            CurrResolutionReturnJMP = CurrResolutionAddress + CurrResolutionHookLength;
+            Memory::DetourFunction64((void*)CurrResolutionAddress, CurrResolution_CC, CurrResolutionHookLength);
 
+            LOG_F(INFO, "Current Resolution: Hook length is %d bytes", CurrResolutionHookLength);
+            LOG_F(INFO, "Current Resolution: Hook address is 0x%" PRIxPTR, (uintptr_t)CurrResolutionAddress);
+        }
+        else if (!CurrResolutionScanResult)
+        {
+            LOG_F(INFO, "Current Resolution: Pattern scan failed.");
+        }
+    }
+    
     if (bAspectFix)
     {
         // UCameraComponent::GetCameraView
@@ -279,6 +363,7 @@ void AspectFOVFix()
             FOVPiDiv = fPi / 360;
             FOVDivPi = 360 / fPi;
 
+            // Adjust aspect ratio and FOV
             DWORD64 AspectFOVFixAddress = (uintptr_t)AspectFOVFixScanResult + 0x8;
             int AspectFOVFixHookLength = Memory::GetHookLength((char*)AspectFOVFixAddress, 13);
             AspectFOVFixReturnJMP = AspectFOVFixAddress + AspectFOVFixHookLength;
@@ -306,6 +391,7 @@ void AspectFOVFix()
                 HUDYOffset = ((float)iCustomResY - ((float)iCustomResX / fNativeAspect)) / 2;
             }
 
+            // Offset HUD markers
             DWORD64 HUDMarkersAddress = (uintptr_t)HUDMarkersScanResult;
             int HUDMarkersHookLength = Memory::GetHookLength((char*)HUDMarkersAddress, 13);
             HUDMarkersReturnJMP = HUDMarkersAddress + HUDMarkersHookLength;
@@ -326,13 +412,14 @@ void AspectFOVFix()
         uint8_t* FOVCullingScanResult = Memory::PatternScan(baseModule, "8B ?? ?? ?? ?? ?? F2 ?? ?? ?? ?? ?? 89 ?? ?? ?? 84 ?? 75 ??");
         if (FOVCullingScanResult)
         {
-                DWORD64 FOVCullingAddress = (uintptr_t)FOVCullingScanResult - 0x10;
-                int FOVCullingHookLength = Memory::GetHookLength((char*)FOVCullingAddress, 13);
-                FOVCullingReturnJMP = FOVCullingAddress + FOVCullingHookLength;
-                Memory::DetourFunction64((void*)FOVCullingAddress, FOVCulling_CC, FOVCullingHookLength);
+            // Fix static mesh culling at high FOV
+            DWORD64 FOVCullingAddress = (uintptr_t)FOVCullingScanResult - 0x10;
+            int FOVCullingHookLength = Memory::GetHookLength((char*)FOVCullingAddress, 13);
+            FOVCullingReturnJMP = FOVCullingAddress + FOVCullingHookLength;
+            Memory::DetourFunction64((void*)FOVCullingAddress, FOVCulling_CC, FOVCullingHookLength);
 
-                LOG_F(INFO, "FOV Culling: Hook length is %d bytes", FOVCullingHookLength);
-                LOG_F(INFO, "FOV Culling: Hook address is 0x%" PRIxPTR, (uintptr_t)FOVCullingAddress);
+            LOG_F(INFO, "FOV Culling: Hook length is %d bytes", FOVCullingHookLength);
+            LOG_F(INFO, "FOV Culling: Hook address is 0x%" PRIxPTR, (uintptr_t)FOVCullingAddress);
         }
         else if (!FOVCullingScanResult)
         {
