@@ -2,14 +2,17 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W01UAI9)</br>
 [![Github All Releases](https://img.shields.io/github/downloads/Lyall/StarTrekResurgenceFix/total.svg)](https://github.com/Lyall/StarTrekResurgenceFix/releases)
 
-This is a fix to remove pillarboxing/letterboxing in Star Trek Resurgence.
+This is a fix for Star Trek Resurgence that adds support for custom resolutions/aspect ratios, uncapped framerate and more.
 
 ## Features
-- Custom resolution support.
+- Custom resolution/aspect ratio support.
 - Removes pillarboxing/letterboxing in gameplay and cutscenes.
 - Correct FOV scaling no matter what resolution you use.
-- Disable depth of field.
-- Disable motion blur.
+- Disable FPS cap in both gameplay/cutscenes + enable interpolation in cutscenes for smoother animations.
+- Toggles for motion blur and depth of field.
+
+## Extra Ini Tweaks
+- See [extras.md](extras.md).
 
 ## Installation
 - Grab the latest release of StarTrekResurgenceFix from [here.](https://github.com/Lyall/StarTrekResurgenceFix/releases)
@@ -26,7 +29,10 @@ This is a fix to remove pillarboxing/letterboxing in Star Trek Resurgence.
 
 ## Known Issues
 Please report any issues you see.
-- Despite removing the 30fps cap some animations appear to be keyframed at 30fps and may appear juddery.
+- When using a custom resolution, the resolution option in settings will appear blank, this is just cosmetic and doesn't affect functionality.
+- Mouse sensitivity during QTE interaction segments will be slower the higher the framerate.
+- Controller sensitivity is higher during gameplay and lower during QTE interactions with higher framerates.
+- Running a resolution higher than 4K on either axis may cause the game to run extremely poorly. ([#4](https://github.com/Lyall/StarTrekResurgenceFix/issues/4))
 
 ## Screenshots
 
