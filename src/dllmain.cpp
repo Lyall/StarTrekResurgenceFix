@@ -97,12 +97,12 @@ void __declspec(naked) AspectFOVFix_CC()
             fxch st(1)                              // Swap st(1) to st(0)
             fpatan                                  // Get partial arc tangent from st(0), st(1)
             fmul[FOVDivPi]                          // Multiply st(0) by 360/Pi
-            fadd[fAdditionalFOV]                    // Add additional FOV
             fstp[FOVFinalValue]                     // Store st(0) 
             movss xmm0, [FOVFinalValue]             // Copy final FOV value to xmm0
             jmp originalCode
 
         originalCode:
+            addss xmm0, [fAdditionalFOV]
             movss[rdi + 0x18], xmm0                 // Original code
             cmp [iAspectFix], 1
             je modifyAspect
@@ -415,6 +415,10 @@ void AspectFOVFix()
         {
             LOG_F(INFO, "FOV Culling: Pattern scan failed.");
         }
+    }
+    else
+    {
+        fAdditionalFOV = (float)0;
     }
 }
 
