@@ -33,6 +33,7 @@ Please report any issues you see.
 - Mouse sensitivity during QTE interaction segments will be slower the higher the framerate.
 - Controller sensitivity is higher during gameplay and lower during QTE interactions with higher framerates.
 - Running a resolution higher than 4K on either axis may cause the game to run extremely poorly. ([#4](https://github.com/Lyall/StarTrekResurgenceFix/issues/4))
+- In some segments enemies may not spawn in with the framerate uncapped. ([#5](https://github.com/Lyall/StarTrekResurgenceFix/issues/5))
 
 ## Screenshots
 
