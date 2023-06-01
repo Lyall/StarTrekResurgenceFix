@@ -22,7 +22,7 @@ This is a fix for Star Trek Resurgence that adds support for custom resolutions/
 - Tested on the Epic Store version at 32:9 and 21:9.
 
 ### Linux/Steam Deck
-- ***For Linux/Steam Deck only***: Make sure you set the Steam launch options to `WINEDLLOVERRIDES="winmm.dll=n,b" %command%`
+- ***For Linux/Steam Deck only***: See my detailed [instructions here](https://github.com/Lyall/StarTrekResurgenceFix/issues/2#issuecomment-1572309471).
 
 ## Configuration
 - See **StarTrekResurgenceFix.ini** to adjust settings for the fix.
