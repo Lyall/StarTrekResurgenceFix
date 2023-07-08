@@ -5,11 +5,11 @@
 This is a fix for Star Trek Resurgence that adds support for custom resolutions/aspect ratios, uncapped framerate and more.
 
 ## Features
-- Custom resolution/aspect ratio support.
+- Arbritrary aspect ratio support.
 - Removes pillarboxing/letterboxing in gameplay and cutscenes.
 - Correct FOV scaling no matter what resolution you use.
-- Disable FPS cap in both gameplay/cutscenes + enable interpolation in cutscenes for smoother animations.
-- Toggles for motion blur and depth of field.
+- Disables 62FPS cap.
+- Toggle for depth of field.
 
 ## Extra Ini Tweaks
 - See [extras.md](extras.md).
@@ -22,23 +22,23 @@ This is a fix for Star Trek Resurgence that adds support for custom resolutions/
 - Tested on the Epic Store version at 32:9 and 21:9.
 
 ### Linux/Steam Deck
-- ***For Linux/Steam Deck only***: Make sure you set the Steam launch options to `WINEDLLOVERRIDES="winmm.dll=n,b" %command%`
+- ***For Linux/Steam Deck only***: See my detailed [instructions here](https://github.com/Lyall/StarTrekResurgenceFix/issues/2#issuecomment-1572309471).
 
 ## Configuration
 - See **StarTrekResurgenceFix.ini** to adjust settings for the fix.
 
 ## Known Issues
 Please report any issues you see.
-- When using a custom resolution, the resolution option in settings will appear blank, this is just cosmetic and doesn't affect functionality.
 - Mouse sensitivity during QTE interaction segments will be slower the higher the framerate.
 - Controller sensitivity is higher during gameplay and lower during QTE interactions with higher framerates.
 - Running a resolution higher than 4K on either axis may cause the game to run extremely poorly. ([#4](https://github.com/Lyall/StarTrekResurgenceFix/issues/4))
+- In some segments enemies may not spawn in with the framerate uncapped. ([#5](https://github.com/Lyall/StarTrekResurgenceFix/issues/5))
 
 ## Screenshots
 
 | ![ezgif-5-883b951a78](https://github.com/Lyall/StarTrekResurgenceFix/assets/695941/6e502569-7270-4f88-8f57-ec2ac6519c09) |
 |:--:|
-| Custom resolution with disabled pillarboxing/letterboxing in gameplay. |
+| Pillarboxing/letterboxing disabled in gameplay. |
 
 ## Credits
 [Flawless Widescreen](https://www.flawlesswidescreen.org/) for the LOD fix.<br />
