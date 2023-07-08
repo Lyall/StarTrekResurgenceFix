@@ -5,7 +5,7 @@
 This is a fix for Star Trek Resurgence that adds support for custom resolutions/aspect ratios, uncapped framerate and more.
 
 ## Features
-- Arbritrary aspect ratio support.
+- Arbitrary aspect ratio support.
 - Removes pillarboxing/letterboxing in gameplay and cutscenes.
 - Correct FOV scaling no matter what resolution you use.
 - Disables 62FPS cap.
