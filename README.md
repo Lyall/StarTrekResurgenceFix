@@ -8,7 +8,7 @@ This is a fix for Star Trek Resurgence that adds support for custom resolutions/
 - Arbritrary aspect ratio support.
 - Removes pillarboxing/letterboxing in gameplay and cutscenes.
 - Correct FOV scaling no matter what resolution you use.
-- Disable 62FPS cap.
+- Disables 62FPS cap.
 - Toggle for depth of field.
 
 ## Extra Ini Tweaks
