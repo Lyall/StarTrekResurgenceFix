@@ -38,7 +38,7 @@ Please report any issues you see.
 
 | ![ezgif-5-883b951a78](https://github.com/Lyall/StarTrekResurgenceFix/assets/695941/6e502569-7270-4f88-8f57-ec2ac6519c09) |
 |:--:|
-| Custom resolution with disabled pillarboxing/letterboxing in gameplay. |
+| Pillarboxing/letterboxing disabled in gameplay. |
 
 ## Credits
 [Flawless Widescreen](https://www.flawlesswidescreen.org/) for the LOD fix.<br />
