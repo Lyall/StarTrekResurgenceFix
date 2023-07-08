@@ -11,10 +11,7 @@ inipp::Ini<char> ini;
 bool bAspectFix;
 bool bFOVFix;
 bool bUncapFPS;
-bool bCutsceneFPS;
 bool bDisableDOF;
-bool bDisableMotionBlur;
-bool bCustomRes;
 int iCustomResX;
 int iCustomResY;
 int iInjectionDelay;
@@ -51,23 +48,6 @@ void __declspec(naked) CurrResolution_CC()
         xorps xmm14, xmm14
         xorps xmm15, xmm15
         jmp[CurrResolutionReturnJMP]
-    }
-}
-
-
-// ApplyResolution Hook
-DWORD64 ApplyResolutionReturnJMP;
-void __declspec(naked) ApplyResolution_CC()
-{
-    __asm
-    {
-        mov[rsp + 0x08], rbx                        // Original Code
-        mov[rsp + 0x10], rsi                        // Original Code
-        mov[rsp + 0x18], rdi                        // Original Code
-
-        mov ecx, iCustomResX
-        mov edx, iCustomResY
-        jmp[ApplyResolutionReturnJMP]
     }
 }
 
@@ -148,23 +128,6 @@ void __declspec(naked) FOVCulling_CC()
             movss[rdx + 0x000002E8], xmm1           // Original code
             movsd xmm0, [rbp + 0x000000E0]          // Original code
             jmp[FOVCullingReturnJMP]
-    }
-}
-
-// Movie Interpolation Hook
-DWORD64 MovieInterpReturnJMP;
-void __declspec(naked) MovieInterp_CC()
-{
-    __asm
-    {
-        mov byte ptr[rcx + 0x10], 01                // Force EMovieSceneEvaluationType to be "WithSubFrames" (1) instead of "FrameLocked" (0)
-        jmp originalCode
-
-        originalCode:
-            mov rbp, rsp                            // Original code
-            sub rsp, 128                            // Original code
-            cmp byte ptr[rcx + 0x10], 00            // Original code
-            jmp[MovieInterpReturnJMP]
     }
 }
 
@@ -262,18 +225,13 @@ void ReadConfig()
     }
 
     inipp::get_value(ini.sections["StarTrekResurgenceFix Parameters"], "InjectionDelay", iInjectionDelay);
-    inipp::get_value(ini.sections["Custom Resolution"], "Enabled", bCustomRes);
-    inipp::get_value(ini.sections["Custom Resolution"], "Width", iCustomResX);
-    inipp::get_value(ini.sections["Custom Resolution"], "Height", iCustomResY);
     inipp::get_value(ini.sections["Fix Aspect Ratio"], "Enabled", bAspectFix);
     iAspectFix = (int)bAspectFix;
     inipp::get_value(ini.sections["Fix FOV"], "Enabled", bFOVFix);
     iFOVFix = (int)bFOVFix;
     inipp::get_value(ini.sections["Fix FOV"], "AdditionalFOV", fAdditionalFOV);
     inipp::get_value(ini.sections["Uncap FPS"], "Enabled", bUncapFPS);
-    inipp::get_value(ini.sections["Uncap Cutscene FPS"], "Enabled", bCutsceneFPS);
     inipp::get_value(ini.sections["Disable Depth of Field"], "Enabled", bDisableDOF);
-    inipp::get_value(ini.sections["Disable Motion Blur"], "Enabled", bDisableMotionBlur);
 
     // Custom resolution
     if (iCustomResX > 0 && iCustomResY > 0)
@@ -300,12 +258,7 @@ void ReadConfig()
     LOG_F(INFO, "Config Parse: bFOVFix: %d", bFOVFix);
     LOG_F(INFO, "Config Parse: fAdditionalFOV: %.2f", fAdditionalFOV);
     LOG_F(INFO, "Config Parse: bUncapFPS: %d", bUncapFPS);
-    LOG_F(INFO, "Config Parse: bCutsceneFPS: %d", bCutsceneFPS);
     LOG_F(INFO, "Config Parse: bDisableDOF: %d", bDisableDOF);
-    LOG_F(INFO, "Config Parse: bDisableMotionBlur: %d", bDisableMotionBlur);
-    LOG_F(INFO, "Config Parse: bCustomRes: %d", bCustomRes);
-    LOG_F(INFO, "Config Parse: iCustomResX: %d", iCustomResX);
-    LOG_F(INFO, "Config Parse: iCustomResY: %d", iCustomResY);
     LOG_F(INFO, "Config Parse: fNewX: %.2f", fNewX);
     LOG_F(INFO, "Config Parse: fNewY: %.2f", fNewY);
     LOG_F(INFO, "Config Parse: fNewAspect: %.4f", fNewAspect);
@@ -313,27 +266,8 @@ void ReadConfig()
 
 void AspectFOVFix()
 {
-    if (bCustomRes)
-    {
-        // FSystemResolution::RequestResolutionChange
-        uint8_t* ApplyResolutionScanResult = Memory::PatternScan(baseModule, "8B ?? ?? ?? E8 ?? ?? ?? ?? 83 ?? ?? 77 ?? 85 ??");
-        if (ApplyResolutionScanResult)
-        {
-            // Override resolution change
-            DWORD64 ApplyResolutionAddress = Memory::GetAbsolute((uintptr_t)ApplyResolutionScanResult + 0x5);
-            int ApplyResolutionHookLength = Memory::GetHookLength((char*)ApplyResolutionAddress, 13);
-            ApplyResolutionReturnJMP = ApplyResolutionAddress + ApplyResolutionHookLength;
-            Memory::DetourFunction64((void*)ApplyResolutionAddress, ApplyResolution_CC, ApplyResolutionHookLength);
 
-            LOG_F(INFO, "Apply Resolution: Hook length is %d bytes", ApplyResolutionHookLength);
-            LOG_F(INFO, "Apply Resolution: Hook address is 0x%" PRIxPTR, (uintptr_t)ApplyResolutionAddress);
-        }
-        else if (!ApplyResolutionScanResult)
-        {
-            LOG_F(INFO, "Apply Resolution: Pattern scan failed.");
-        }
-    }
-    else
+    if (bAspectFix)
     {
         // FSlateRHIRenderer::ConditionalResizeViewport 
         uint8_t* CurrResolutionScanResult = Memory::PatternScan(baseModule, "33 ?? B9 ?? ?? ?? ?? 45 ?? ?? 48 ?? ?? 4A ?? ?? ?? 48 ?? ?? 8B ??");
@@ -352,10 +286,7 @@ void AspectFOVFix()
         {
             LOG_F(INFO, "Current Resolution: Pattern scan failed.");
         }
-    }
-    
-    if (bAspectFix)
-    {
+
         // UCameraComponent::GetCameraView
         uint8_t* AspectFOVFixScanResult = Memory::PatternScan(baseModule, "F3 0F ?? ?? ?? ?? ?? ?? F3 0F ?? ?? ?? 8B ?? ?? ?? ?? ?? 89 ?? ?? 0F ?? ?? ?? ?? ?? ?? 33 ?? ?? 83 ?? ??");
         if (AspectFOVFixScanResult)
@@ -444,41 +375,6 @@ void UncapFPS()
             LOG_F(INFO, "Uncap FPS: Pattern scan failed.");
         }
     } 
-
-    if (bCutsceneFPS)
-    {
-        // UEngine::GetMaxTickRate
-        uint8_t* CutsceneFPSScanResult = Memory::PatternScan(baseModule, "3B ?? ?? ?? ?? ?? 0F ?? ?? F3 0F ?? ?? ?? EB ?? 0F ?? ??");
-        if (CutsceneFPSScanResult)
-        {
-            // Zero the value for cutscene framerate cap
-            DWORD64 CutsceneFPSAddress = (uintptr_t)CutsceneFPSScanResult + 0x9;
-            Memory::PatchBytes((uintptr_t)CutsceneFPSAddress, "\x0F\x57\xC0\x90\x90", 5);
-            LOG_F(INFO, "Cutscene FPS: Patch address is 0x%" PRIxPTR, (uintptr_t)CutsceneFPSAddress);
-        }
-        else if (!CutsceneFPSScanResult)
-        {
-            LOG_F(INFO, "Cutscene FPS: Pattern scan failed.");
-        }
-
-        // FMovieScenePlaybackPosition::PlayTo 
-        uint8_t* MovieInterpScanResult = Memory::PatternScan(baseModule, "41 ?? 48 ?? ?? 48 ?? ?? ?? ?? 00 00 80 ?? ?? 00 49 ?? ?? 0F ?? ?? ?? ?? 48 ?? ??");
-        if (MovieInterpScanResult)
-        {
-            // Set EMovieSceneEvaluationType to be "WithSubFrames" (1) instead of "FrameLocked" (0)
-            DWORD64 MovieInterpAddress = (uintptr_t)MovieInterpScanResult + 0x2;
-            int MovieInterpHookLength = (int)14;
-            MovieInterpReturnJMP = MovieInterpAddress + MovieInterpHookLength;
-            Memory::DetourFunction64((void*)MovieInterpAddress, MovieInterp_CC, MovieInterpHookLength);
-
-            LOG_F(INFO, "Movie Interpolation: Hook length is %d bytes", MovieInterpHookLength);
-            LOG_F(INFO, "Movie Interpolation: Hook address is 0x%" PRIxPTR, (uintptr_t)MovieInterpAddress);
-        }
-        else if (!MovieInterpScanResult)
-        {
-            LOG_F(INFO, "Movie Interpolation: Pattern scan failed.");
-        }
-    }
 }
 
 void GraphicalTweaks()
@@ -498,24 +394,6 @@ void GraphicalTweaks()
         else if (!DOFScanResult)
         {
             LOG_F(INFO, "Depth of Field: Pattern scan failed.");
-        }
-    }
-
-    if (bDisableMotionBlur)
-    {
-        // IsMotionBlurEnabled
-        uint8_t* MotionBlurScanResult = Memory::PatternScan(baseModule, "73 ?? 80 ?? ?? 00 74 ?? 85 ?? 7E ?? 48 ?? ?? ?? ?? ?? ??");
-        if (MotionBlurScanResult)
-        {
-            // JMP to code path where motion blur is disabled
-            DWORD64 MotionBlurAddress = (uintptr_t)MotionBlurScanResult + 0xA;
-            Memory::PatchBytes((uintptr_t)MotionBlurAddress, "\xEB", 1);
-
-            LOG_F(INFO, "Motion Blur: Patch address is 0x%" PRIxPTR, (uintptr_t)MotionBlurAddress);
-        }
-        else if (!MotionBlurScanResult)
-        {
-            LOG_F(INFO, "Motion Blur: Pattern scan failed.");
         }
     }
 }
