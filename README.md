@@ -29,6 +29,7 @@ This is a fix for Star Trek Resurgence that adds support for custom resolutions/
 
 ## Known Issues
 Please report any issues you see.
+- Cutscenes still appear to animate at 30fps (patch 1.1).
 - Mouse sensitivity during QTE interaction segments will be slower the higher the framerate.
 - Controller sensitivity is higher during gameplay and lower during QTE interactions with higher framerates.
 - Running a resolution higher than 4K on either axis may cause the game to run extremely poorly. ([#4](https://github.com/Lyall/StarTrekResurgenceFix/issues/4))
