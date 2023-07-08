@@ -5,11 +5,11 @@
 This is a fix for Star Trek Resurgence that adds support for custom resolutions/aspect ratios, uncapped framerate and more.
 
 ## Features
-- Custom resolution/aspect ratio support.
+- Arbritrary aspect ratio support.
 - Removes pillarboxing/letterboxing in gameplay and cutscenes.
 - Correct FOV scaling no matter what resolution you use.
 - Disable FPS cap in both gameplay/cutscenes + enable interpolation in cutscenes for smoother animations.
-- Toggles for motion blur and depth of field.
+- Toggle for depth of field.
 
 ## Extra Ini Tweaks
 - See [extras.md](extras.md).
@@ -29,7 +29,6 @@ This is a fix for Star Trek Resurgence that adds support for custom resolutions/
 
 ## Known Issues
 Please report any issues you see.
-- When using a custom resolution, the resolution option in settings will appear blank, this is just cosmetic and doesn't affect functionality.
 - Mouse sensitivity during QTE interaction segments will be slower the higher the framerate.
 - Controller sensitivity is higher during gameplay and lower during QTE interactions with higher framerates.
 - Running a resolution higher than 4K on either axis may cause the game to run extremely poorly. ([#4](https://github.com/Lyall/StarTrekResurgenceFix/issues/4))
